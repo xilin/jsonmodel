@@ -6,6 +6,7 @@
 #import <Foundation/Foundation.h>
 
 typedef NSString *(^JSONModelKeyMapBlock)(NSString *keyName);
+typedef NSString *(^JSONModelMultiKeysMapBlock)(NSDictionary *jsonDictionary, NSString *keyName);
 
 /**
  * **You won't need to create or store instances of this class yourself.** If you want your model
@@ -51,12 +52,20 @@ typedef NSString *(^JSONModelKeyMapBlock)(NSString *keyName);
 /** @name Name converters */
 /** Block, which takes in a property name and converts it to the corresponding JSON key name */
 @property (readonly, nonatomic) JSONModelKeyMapBlock modelToJSONKeyBlock;
+@property (readonly, nonatomic) JSONModelMultiKeysMapBlock modelToMultiJSONKeysBlock;
 
 /** Combined converter method
  * @param value the source name
- * @return JSONKeyMapper instance
+ * @return converted value
  */
 - (NSString *)convertValue:(NSString *)value;
+
+/** Combined converter method
+ * @param value the source name
+ * @param jsonDictionary the source jsonDictionary
+ * @return converted value
+ */
+- (NSString *)convertValue:(NSString *)value forDictionary:(NSDictionary *)jsonDictionary;
 
 /** @name Creating a key mapper */
 
@@ -68,6 +77,16 @@ typedef NSString *(^JSONModelKeyMapBlock)(NSString *keyName);
  * @param toJSON transforms your model property name to a JSON key
  */
 - (instancetype)initWithModelToJSONBlock:(JSONModelKeyMapBlock)toJSON;
+
+/**
+ * Creates a JSONKeyMapper instance, based on the block you provide this initializer.
+ * The parameter takes in a JSONModelMultiKeysMapBlock block:
+ * <pre>NSString *(^JSONModelMultiKeysMapBlock)(NSDictionary *jsonDictionary, NSString *keyName)</pre>
+ * The block takes in a json dictionary and a string, returns the transformed (if at all) string.
+ * You should judge which key is the mapped JSON key based on the input dictionary
+ * @param toJSON transforms your model property name to a JSON key
+ */
+- (instancetype)initWithMultiJSONKeysToOneModelBlock:(JSONModelMultiKeysMapBlock)toJSON;
 
 /**
  * Creates a JSONKeyMapper instance, based on the mapping you provide.

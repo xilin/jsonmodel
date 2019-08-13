@@ -22,6 +22,15 @@
     return self;
 }
 
+- (instancetype)initWithMultiJSONKeysToOneModelBlock:(JSONModelMultiKeysMapBlock)toJSON {
+    if (!(self = [self init]))
+        return nil;
+    
+    _modelToMultiJSONKeysBlock = toJSON;
+    
+    return self;
+}
+
 - (instancetype)initWithDictionary:(NSDictionary *)map
 {
     NSDictionary *toJSON  = [JSONKeyMapper swapKeysAndValuesInDictionary:map];
@@ -63,6 +72,13 @@
 - (NSString *)convertValue:(NSString *)value
 {
     return _modelToJSONKeyBlock(value);
+}
+
+- (NSString *)convertValue:(NSString *)value forDictionary:(NSDictionary *)jsonDictionary {
+    if (_modelToMultiJSONKeysBlock) {
+        return _modelToMultiJSONKeysBlock(jsonDictionary, value);
+    }
+    return [self convertValue:value];
 }
 
 + (instancetype)mapperFromUnderscoreCaseToCamelCase
